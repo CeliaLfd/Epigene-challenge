@@ -1,10 +1,29 @@
-import logo from "./assets/epigenelogo.png";
+import styled from "@emotion/styled";
+import { Header } from "./components/Header";
+import { spacings } from "./style/theme";
+import { remCalc } from "./utils/selectors";
+
+const AppWrapper = styled.div`
+  display: grid;
+  grid-template-areas: "sidebar content";
+  min-height: 100vh;
+  grid-template-columns: ${remCalc(240)} minmax(0, 1fr);
+`;
+
+const AppContent = styled.main`
+  padding: ${spacings.large};
+  max-width: ${remCalc(1400)};
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+`;
 
 const App = () => {
   return (
-    <div>
-      <img src={logo} alt="epigene labs" />
-    </div>
+    <AppWrapper>
+      <Header />
+      <AppContent>Content</AppContent>
+    </AppWrapper>
   );
 };
 
