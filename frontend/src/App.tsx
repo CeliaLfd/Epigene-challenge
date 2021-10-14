@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
 import { Header } from "./components/Header";
+import Genesets from "./pages/Genesets";
 import { spacings } from "./style/theme";
 import { remCalc } from "./utils/selectors";
 
@@ -22,7 +23,9 @@ const App = () => {
   return (
     <AppWrapper>
       <Header />
-      <AppContent>Content</AppContent>
+      <AppContent>
+        <Genesets />
+      </AppContent>
     </AppWrapper>
   );
 };
