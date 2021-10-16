@@ -1,6 +1,19 @@
-import { useEffect, useState } from "react";
-import { Column } from "../components/common/GridFlex/GridFlex";
-import { H2, Text } from "../components/common/Typography/Typography";
+import React, { useEffect, useState } from "react";
+import { Button } from "../components/common/Button/Button";
+import { Column, Row } from "../components/common/GridFlex/GridFlex";
+import { Input } from "../components/common/Input/Input";
+import {
+  Table,
+  TableCell,
+  TableHead,
+  TableRow,
+} from "../components/common/Table/Table";
+import { Tag } from "../components/common/Tag/Tag";
+import {
+  H1,
+  Text,
+  TextSecondary,
+} from "../components/common/Typography/Typography";
 
 type gene = {
   name: string;
@@ -14,7 +27,7 @@ type genesetsType = {
   genes: gene[];
 };
 
-const genesetsPerPage = 10;
+const genesetsPerPage = 5;
 
 const getNextGenesets = (arr: genesetsType[]) => (index: number) => {
   const genesets = arr.slice(index, index + genesetsPerPage);
@@ -27,6 +40,8 @@ const Genesets = () => {
   const [displayGenesets, setDisplayGenesets] = useState<genesetsType[]>([]);
   const [next, setNext] = useState(genesetsPerPage);
 
+  const [search, setSearch] = useState("");
+
   const getGenesets = getNextGenesets(genesetsList);
 
   useEffect(() => {
@@ -38,8 +53,16 @@ const Genesets = () => {
   }, []);
 
   useEffect(() => {
-    setDisplayGenesets(getGenesets(0));
-  }, [genesetsList]);
+    if (search != "") {
+      const results = genesetsList.filter((item) =>
+        item.title.toUpperCase().includes(search.toUpperCase())
+      );
+
+      setDisplayGenesets(results);
+    } else {
+      setDisplayGenesets(getGenesets(0));
+    }
+  }, [genesetsList, search]);
 
   const handleShowMoreGenesets = () => {
     const genesets = [...displayGenesets, ...getGenesets(next)];
@@ -47,27 +70,50 @@ const Genesets = () => {
     setNext(next + genesetsPerPage);
   };
 
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(event.target.value);
+  };
+
   return (
     <Column gap="large">
-      <H2>Genesets list</H2>
-      <div>
-        <ul>
-          {displayGenesets.map((geneset, index) => (
-            <li key={index}>
-              <Text>{geneset.title}</Text>
-              <p>
-                {geneset.genes.length}{" "}
-                {geneset.genes.length > 1 ? "genes" : "gene"}
-              </p>
-              <div>
-                {!!geneset.genes.length &&
-                  geneset.genes.map((gene) => <p>{gene.name}</p>)}
-              </div>
-            </li>
-          ))}
-        </ul>
-        <button onClick={handleShowMoreGenesets}>Load more</button>
-      </div>
+      <H1>Genesets list</H1>
+      <Input
+        type="text"
+        onChange={handleSearch}
+        placeholder="Search a geneset by title"
+      />
+
+      <Table wrap="wrap" gap="xsmall">
+        <TableHead gap="medium">
+          <TableCell width="20%">Title</TableCell>
+          <TableCell grow={1}>Genes</TableCell>
+        </TableHead>
+        {displayGenesets.map((geneset, index) => (
+          <TableRow key={index} gap="medium">
+            <TableCell width="20%">
+              <Column gap="tiny" horizontalAlignment="flex-start">
+                <Text weight="semibold">{geneset.title}</Text>
+                <Tag>
+                  {geneset.genes.length}{" "}
+                  {geneset.genes.length > 1 ? "genes" : "gene"}
+                </Tag>
+              </Column>
+            </TableCell>
+            <TableCell grow={1}>
+              <Row gap="small">
+                {!!geneset.genes.length ? (
+                  geneset.genes.map((gene) => (
+                    <Tag level="hollow">{gene.name}</Tag>
+                  ))
+                ) : (
+                  <TextSecondary>No gene</TextSecondary>
+                )}
+              </Row>
+            </TableCell>
+          </TableRow>
+        ))}
+        <Button onClick={handleShowMoreGenesets}>Load more</Button>
+      </Table>
     </Column>
   );
 };
